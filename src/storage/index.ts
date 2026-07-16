@@ -72,6 +72,7 @@ export interface NewMeal {
   carbs_g: number;
   fat_g: number;
   confidence: Confidence;
+  note: string;
 }
 
 export async function addMeal(meal: NewMeal): Promise<Meal> {
@@ -79,8 +80,8 @@ export async function addMeal(meal: NewMeal): Promise<Meal> {
   const id = randomUUID();
   const createdAt = Date.now();
   await db.runAsync(
-    `INSERT INTO meals (id, date, mealType, description, photoUri, calories, protein_g, carbs_g, fat_g, confidence, createdAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO meals (id, date, mealType, description, photoUri, calories, protein_g, carbs_g, fat_g, confidence, note, createdAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       meal.date,
@@ -92,6 +93,7 @@ export async function addMeal(meal: NewMeal): Promise<Meal> {
       meal.carbs_g,
       meal.fat_g,
       meal.confidence,
+      meal.note,
       createdAt,
     ]
   );
@@ -119,13 +121,14 @@ export interface MealEdits {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
+  note: string;
 }
 
 export async function updateMeal(id: string, edits: MealEdits): Promise<void> {
   const db = await getDb();
   await db.runAsync(
     `UPDATE meals
-     SET mealType = ?, description = ?, calories = ?, protein_g = ?, carbs_g = ?, fat_g = ?
+     SET mealType = ?, description = ?, calories = ?, protein_g = ?, carbs_g = ?, fat_g = ?, note = ?
      WHERE id = ?`,
     [
       edits.mealType,
@@ -134,6 +137,7 @@ export async function updateMeal(id: string, edits: MealEdits): Promise<void> {
       edits.protein_g,
       edits.carbs_g,
       edits.fat_g,
+      edits.note,
       id,
     ]
   );

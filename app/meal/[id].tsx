@@ -35,6 +35,7 @@ export default function MealDetailScreen() {
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [note, setNote] = useState('');
 
   const load = useCallback(async () => {
     if (!id) {
@@ -55,6 +56,7 @@ export default function MealDetailScreen() {
     setProtein(String(found.protein_g));
     setCarbs(String(found.carbs_g));
     setFat(String(found.fat_g));
+    setNote(found.note);
     setLoading(false);
   }, [id]);
 
@@ -84,6 +86,7 @@ export default function MealDetailScreen() {
         protein_g: round(p),
         carbs_g: round(c),
         fat_g: round(f),
+        note: note.trim(),
       });
       router.back();
     } catch {
@@ -166,6 +169,14 @@ export default function MealDetailScreen() {
         <EditField label="Protein (g)" value={protein} onChangeText={setProtein} keyboardType="numeric" theme={theme} />
         <EditField label="Carbs (g)" value={carbs} onChangeText={setCarbs} keyboardType="numeric" theme={theme} />
         <EditField label="Fat (g)" value={fat} onChangeText={setFat} keyboardType="numeric" theme={theme} />
+        <EditField
+          label="Note"
+          value={note}
+          onChangeText={setNote}
+          theme={theme}
+          multiline
+          placeholder="Portion size, brand, how it was cooked..."
+        />
 
         <Pressable
           onPress={onSave}
@@ -197,12 +208,16 @@ function EditField({
   onChangeText,
   theme,
   keyboardType,
+  multiline,
+  placeholder,
 }: {
   label: string;
   value: string;
   onChangeText: (t: string) => void;
   theme: ReturnType<typeof useTheme>;
   keyboardType?: 'numeric' | 'default';
+  multiline?: boolean;
+  placeholder?: string;
 }) {
   return (
     <View style={styles.field}>
@@ -211,7 +226,14 @@ function EditField({
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType ?? 'default'}
-        style={[styles.input, { borderColor: theme.border, color: theme.textPrimary, backgroundColor: theme.card }]}
+        multiline={multiline}
+        placeholder={placeholder}
+        placeholderTextColor={theme.textMuted}
+        style={[
+          styles.input,
+          multiline && styles.inputMultiline,
+          { borderColor: theme.border, color: theme.textPrimary, backgroundColor: theme.card },
+        ]}
       />
     </View>
   );
@@ -269,6 +291,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 15,
+  },
+  inputMultiline: {
+    minHeight: 60,
+    textAlignVertical: 'top',
   },
   primaryButton: {
     marginTop: 12,

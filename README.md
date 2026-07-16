@@ -70,9 +70,16 @@ If you ever need to change it, just paste a new one in Settings and save.
 ## Data model
 
 Matches Part 1 of the build brief: meals have date, meal type, description,
-photo, calories/protein/carbs/fat, confidence, and a timestamp. Settings is a
-single row: four targets plus race name/date. All numbers are rounded to
-whole units everywhere they're displayed.
+photo, calories/protein/carbs/fat, confidence, an optional note (portion,
+brand, how it was cooked — used to sharpen the AI estimate and kept for later
+reference), and a timestamp. Settings is a single row: four targets plus race
+name/date. All numbers are rounded to whole units everywhere they're
+displayed.
+
+The `note` column was added after the first release, so `src/storage/db.ts`
+runs a small idempotent migration on launch (`addColumnIfMissing`) that
+back-fills it on a phone that already has logged meals, rather than only
+working for fresh installs.
 
 ## Known v1 limitations (by design)
 

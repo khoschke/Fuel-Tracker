@@ -18,6 +18,7 @@ export interface Meal {
   carbs_g: number;
   fat_g: number;
   confidence: Confidence;
+  note: string; // the user's optional note, e.g. portion/brand/how cooked
   createdAt: number; // epoch ms
 }
 

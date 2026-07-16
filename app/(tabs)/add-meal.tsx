@@ -152,6 +152,7 @@ export default function AddMealScreen() {
         carbs_g: round(c),
         fat_g: round(f),
         confidence,
+        note: note.trim(),
       });
 
       resetForm();
