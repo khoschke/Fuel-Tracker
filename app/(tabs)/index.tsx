@@ -114,7 +114,12 @@ export default function DashboardScreen() {
               <View key={g.type} style={styles.mealGroup}>
                 <Text style={[styles.groupLabel, { color: theme.textMuted }]}>{g.label}</Text>
                 {g.meals.map((m) => (
-                  <MealListItem key={m.id} meal={m} theme={theme} />
+                  <MealListItem
+                    key={m.id}
+                    meal={m}
+                    theme={theme}
+                    onPress={() => router.push(`/meal/${m.id}`)}
+                  />
                 ))}
               </View>
             ))}

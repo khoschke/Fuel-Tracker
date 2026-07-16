@@ -46,6 +46,10 @@ If you ever need to change it, just paste a new one in Settings and save.
   and the fuel reference card.
 - `app/(tabs)/add-meal.tsx` — capture/pick a photo, choose meal type, add a
   note, get an editable AI estimate, confirm to save.
+- `app/meal/[id].tsx` — tap any meal on the Dashboard to open this: edit its
+  type, description and macros, or delete it (with confirm). Deleting also
+  removes the photo file from the device so months of logging don't leave
+  orphaned images behind.
 - `app/(tabs)/settings.tsx` — daily targets, race name/date, API key.
 - `src/storage/` — the single storage layer (SQLite via `expo-sqlite`, plus
   the secure API-key store). Every screen goes through `src/storage/index.ts`

@@ -3,6 +3,7 @@
 // (plus apiKey.ts/db.ts it wraps) needs to change — the screens do not
 // know or care that the data lives in an on-device SQLite database.
 import { randomUUID } from 'expo-crypto';
+import { File } from 'expo-file-system';
 import { getDb } from './db';
 import { DEFAULT_SETTINGS, Meal, MealType, Confidence, Settings } from '../types';
 
@@ -105,6 +106,39 @@ export async function getMealsForDate(date: string): Promise<Meal[]> {
   );
 }
 
+export async function getMealById(id: string): Promise<Meal | null> {
+  const db = await getDb();
+  const meal = await db.getFirstAsync<Meal>('SELECT * FROM meals WHERE id = ?', [id]);
+  return meal ?? null;
+}
+
+export interface MealEdits {
+  mealType: MealType;
+  description: string;
+  calories: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+}
+
+export async function updateMeal(id: string, edits: MealEdits): Promise<void> {
+  const db = await getDb();
+  await db.runAsync(
+    `UPDATE meals
+     SET mealType = ?, description = ?, calories = ?, protein_g = ?, carbs_g = ?, fat_g = ?
+     WHERE id = ?`,
+    [
+      edits.mealType,
+      edits.description,
+      edits.calories,
+      edits.protein_g,
+      edits.carbs_g,
+      edits.fat_g,
+      id,
+    ]
+  );
+}
+
 export async function getCaloriesByDate(dateKeys: string[]): Promise<Record<string, number>> {
   if (dateKeys.length === 0) return {};
   const db = await getDb();
@@ -122,5 +156,23 @@ export async function getCaloriesByDate(dateKeys: string[]): Promise<Record<stri
 
 export async function deleteMeal(id: string): Promise<void> {
   const db = await getDb();
+  const meal = await db.getFirstAsync<{ photoUri: string }>(
+    'SELECT photoUri FROM meals WHERE id = ?',
+    [id]
+  );
   await db.runAsync('DELETE FROM meals WHERE id = ?', [id]);
+
+  // Remove the meal's photo from device storage so months of logging don't
+  // leave orphaned image files behind. We only ever store copies we own
+  // (see add-meal.tsx), so this deletes our own file, not the user's library.
+  if (meal?.photoUri) {
+    try {
+      const file = new File(meal.photoUri);
+      if (file.exists) {
+        file.delete();
+      }
+    } catch {
+      // A missing or already-deleted photo file is not worth surfacing.
+    }
+  }
 }
