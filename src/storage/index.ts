@@ -154,6 +154,49 @@ export async function getCaloriesByDate(dateKeys: string[]): Promise<Record<stri
   return result;
 }
 
+export interface DayTotals {
+  date: string;
+  calories: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+  mealCount: number;
+}
+
+// Distinct dates that have at least one meal, most recent first.
+export async function getLoggedDates(limit: number): Promise<string[]> {
+  const db = await getDb();
+  const rows = await db.getAllAsync<{ date: string }>(
+    'SELECT DISTINCT date FROM meals ORDER BY date DESC LIMIT ?',
+    [limit]
+  );
+  return rows.map((r) => r.date);
+}
+
+export async function getDailyTotals(dateKeys: string[]): Promise<Record<string, DayTotals>> {
+  if (dateKeys.length === 0) return {};
+  const db = await getDb();
+  const placeholders = dateKeys.map(() => '?').join(', ');
+  const rows = await db.getAllAsync<DayTotals>(
+    `SELECT
+       date,
+       SUM(calories) as calories,
+       SUM(protein_g) as protein_g,
+       SUM(carbs_g) as carbs_g,
+       SUM(fat_g) as fat_g,
+       COUNT(*) as mealCount
+     FROM meals
+     WHERE date IN (${placeholders})
+     GROUP BY date`,
+    dateKeys
+  );
+  const result: Record<string, DayTotals> = {};
+  for (const row of rows) {
+    result[row.date] = row;
+  }
+  return result;
+}
+
 export async function deleteMeal(id: string): Promise<void> {
   const db = await getDb();
   const meal = await db.getFirstAsync<{ photoUri: string }>(

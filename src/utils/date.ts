@@ -35,3 +35,22 @@ export function shortDayLabel(key: string): string {
   const date = new Date(y, (m ?? 1) - 1, d ?? 1);
   return date.toLocaleDateString('en-AU', { weekday: 'short' });
 }
+
+// "Today", "Yesterday", or e.g. "Wed 15 Jul 2026" for a full date row.
+export function friendlyDateLabel(key: string): string {
+  const today = todayKey();
+  if (key === today) return 'Today';
+
+  const now = new Date();
+  const yesterday = dateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
+  if (key === yesterday) return 'Yesterday';
+
+  const [y, m, d] = key.split('-').map(Number);
+  const date = new Date(y, (m ?? 1) - 1, d ?? 1);
+  return date.toLocaleDateString('en-AU', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}

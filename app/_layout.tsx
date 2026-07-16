@@ -19,6 +19,24 @@ export default function RootLayout() {
             headerTintColor: theme.textPrimary,
           }}
         />
+        <Stack.Screen
+          name="history"
+          options={{
+            headerShown: true,
+            title: 'History',
+            headerStyle: { backgroundColor: theme.surface },
+            headerTintColor: theme.textPrimary,
+          }}
+        />
+        <Stack.Screen
+          name="day/[date]"
+          options={{
+            headerShown: true,
+            title: 'Day',
+            headerStyle: { backgroundColor: theme.surface },
+            headerTintColor: theme.textPrimary,
+          }}
+        />
       </Stack>
       <StatusBar style="auto" />
     </>

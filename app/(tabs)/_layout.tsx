@@ -1,6 +1,23 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
+import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/theme/useTheme';
+
+function HistoryHeaderButton() {
+  const theme = useTheme();
+  const router = useRouter();
+  return (
+    <Pressable
+      onPress={() => router.push('/history')}
+      hitSlop={12}
+      style={{ paddingHorizontal: 12 }}
+      accessibilityRole="button"
+      accessibilityLabel="View history of past days"
+    >
+      <Ionicons name="time-outline" size={22} color={theme.textPrimary} />
+    </Pressable>
+  );
+}
 
 export default function TabsLayout() {
   const theme = useTheme();
@@ -20,6 +37,7 @@ export default function TabsLayout() {
         options={{
           title: 'Dashboard',
           tabBarIcon: ({ color, size }) => <Ionicons name="speedometer-outline" size={size} color={color} />,
+          headerRight: () => <HistoryHeaderButton />,
         }}
       />
       <Tabs.Screen

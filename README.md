@@ -50,6 +50,11 @@ If you ever need to change it, just paste a new one in Settings and save.
   type, description and macros, or delete it (with confirm). Deleting also
   removes the photo file from the device so months of logging don't leave
   orphaned images behind.
+- `app/history.tsx` — reached from the clock icon in the Dashboard header:
+  a list of past logged days, each showing calories vs target, a progress
+  bar, meal count, and a macro summary (carbs highlighted when the day hit
+  target). Tap a day to open `app/day/[date].tsx`, which shows that day's
+  meals grouped by type with a day-total grid; each meal is tappable to edit.
 - `app/(tabs)/settings.tsx` — daily targets, race name/date, API key.
 - `src/storage/` — the single storage layer (SQLite via `expo-sqlite`, plus
   the secure API-key store). Every screen goes through `src/storage/index.ts`

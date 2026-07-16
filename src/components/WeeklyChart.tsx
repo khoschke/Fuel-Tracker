@@ -18,10 +18,13 @@ interface Props {
 
 const CHART_HEIGHT = 130;
 const DASH_COUNT = 28;
+// Headroom above the tallest mark so a bar's value label never rides up into
+// the title/target row. The tallest bar reaches ~80% of the plot height.
+const SCALE_HEADROOM = 1.25;
 
 export function WeeklyChart({ data, target, theme }: Props) {
   const maxValue = Math.max(target, ...data.map((d) => d.calories), 1);
-  const scale = maxValue * 1.1;
+  const scale = maxValue * SCALE_HEADROOM;
   const targetTop = CHART_HEIGHT - (target / scale) * CHART_HEIGHT;
 
   return (
@@ -41,21 +44,23 @@ export function WeeklyChart({ data, target, theme }: Props) {
             const barHeight = Math.max(2, (d.calories / scale) * CHART_HEIGHT);
             return (
               <View key={d.key} style={styles.barColumn}>
-                <Text style={[styles.barValue, { color: d.isToday ? theme.calories : theme.textMuted }]}>
-                  {d.calories > 0 ? round(d.calories) : ''}
-                </Text>
-                <View style={styles.barTrack}>
-                  <View
-                    style={[
-                      styles.bar,
-                      {
-                        height: barHeight,
-                        backgroundColor: theme.calories,
-                        opacity: d.isToday ? 1 : 0.55,
-                      },
-                    ]}
-                  />
-                </View>
+                {/* value label + bar share one flex-end stack, so the label
+                    sits directly above its own bar and rises with it */}
+                {d.calories > 0 && (
+                  <Text style={[styles.barValue, { color: d.isToday ? theme.calories : theme.textMuted }]}>
+                    {round(d.calories)}
+                  </Text>
+                )}
+                <View
+                  style={[
+                    styles.bar,
+                    {
+                      height: barHeight,
+                      backgroundColor: theme.calories,
+                      opacity: d.isToday ? 1 : 0.55,
+                    },
+                  ]}
+                />
               </View>
             );
           })}
@@ -64,7 +69,13 @@ export function WeeklyChart({ data, target, theme }: Props) {
       <View style={styles.barsRow}>
         {data.map((d) => (
           <View key={d.key} style={styles.barColumn}>
-            <Text style={[styles.dayLabel, { color: theme.textMuted }, d.isToday && { color: theme.textPrimary, fontWeight: '700' }]}>
+            <Text
+              style={[
+                styles.dayLabel,
+                { color: theme.textMuted },
+                d.isToday && { color: theme.textPrimary, fontWeight: '700' },
+              ]}
+            >
               {d.label}
             </Text>
           </View>
@@ -111,12 +122,7 @@ const styles = StyleSheet.create({
   barColumn: {
     flex: 1,
     alignItems: 'center',
-  },
-  barTrack: {
-    height: CHART_HEIGHT,
     justifyContent: 'flex-end',
-    width: '100%',
-    alignItems: 'center',
   },
   bar: {
     width: 20,
